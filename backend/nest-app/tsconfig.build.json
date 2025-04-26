@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "removeComments": true,
+    "outDir": "./dist"
+  },
+  "include": ["main.ts", "src/**/*"],  // ✅ 여기 추가
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+}

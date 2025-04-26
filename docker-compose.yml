@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend/nest-app   # ✅ NestJS 소스 위치
+    ports:
+      - "3000:3000"                 # ✅ 로컬:컨테이너 포트
+    env_file:
+      - ./backend/nest-app/.env                        # ✅ 환경변수 정의
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      NODE_ENV: ${NODE_ENV}
+    depends_on:
+      - db
+    networks:
+      - playauto-net
+
+  frontend:
+    build:
+      context: ./frontend           # ✅ React 소스 위치
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - playauto-net
+
+  db:
+    image: mysql:8
+    container_name: playauto-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - playauto-net
+
+volumes:
+  mysql-data:
+
+networks:
+  playauto-net:
