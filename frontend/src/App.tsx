@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div>
-      <h1>📦 상품 목록 [deploy.yml 자동 테스트]</h1>
+      <h1>📦 상품 목록 [deploy.yml 자동]</h1>
       <ul>
         {products.map((product) => (
           <li key={product.id}>
