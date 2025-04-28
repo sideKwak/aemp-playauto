@@ -20,6 +20,16 @@ services:
     networks:
       - playauto-net
 
+  frontend:
+    build:
+      context: ./frontend           # ✅ React 소스 위치
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - playauto-net
+
   db:
     image: mysql:8
     container_name: playauto-db
