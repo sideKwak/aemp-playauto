@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 import './App.css'
 
 // 🔹 Product라는 데이터 타입을 정의 (선택사항, TS인 경우)
