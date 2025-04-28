@@ -10,34 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+        ssh-known-hosts: ${{ secrets.EC2_HOST }}
 
-      - name: Deploy to EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-            # 1. 경로 이동
-            cd ~/aemp-playauto
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ec2-user@54.66.23.6 << 'EOF'
+          set -e  # ⬅️ 중간에 하나라도 에러나면 ssh 연결 종료시킴
+          cd ~/aemp-playauto
 
-            # 2. 최신 소스 가져오기
-            git fetch --all
-            git reset --hard origin/main
+          echo "✅ GIT PULL"
+          git fetch --all
+          git reset --hard origin/main
 
-            # 3. 프론트엔드 빌드
-            cd frontend
-            npm install
-            npm run build
-            cd ..
+          echo "✅ Frontend Build"
+          cd ~/aemp-playauto/frontend
+          npm install
+          npm run build
+          sudo chmod -R 755 ~/aemp-playauto/frontend/dist
 
-            # 4. 백엔드 + DB 도커만 재시작
-            docker compose stop
-            docker compose up -d --build playauto-db aemp-playauto-backend
-
-            # 5. Nginx reload (dist 파일 경로 변경 반영)
-            sudo systemctl reload nginx
-          EOF
+          echo "✅ Backend Docker Restart"
+          cd ~/aemp-playauto  # docker-compose 있는 폴더로 다시 이동
+          sudo docker-compose down
+          sudo docker-compose up -d --build
+        EOF
