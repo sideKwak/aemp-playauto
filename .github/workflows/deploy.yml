@@ -21,7 +21,7 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        ssh -o StrictHostKeyChecking=no ec2-user@54.66.23.6 << 'EOF'
+        ssh -o StrictHostKeyChecking=no ec2-user@3.27.174.144 << 'EOF'
           set -e  # ⬅️ 중간에 하나라도 에러나면 ssh 연결 종료시킴
           cd ~/aemp-playauto
 
