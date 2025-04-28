@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import './App.css'
 
 // 🔹 Product라는 데이터 타입을 정의 (선택사항, TS인 경우)
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-};
+// type Product = {
+//   id: number;
+//   name: string;
+//   price: number;
+//   category: string;
+// };
 
 function App() {
   // 🔹 서버에서 받아온 상품 목록을 담는 state
