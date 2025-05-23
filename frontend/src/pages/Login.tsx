@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../img/logo.png';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 export default function Login() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ username: '', password: '' });
   const navigate = useNavigate();
 
-  const handleCloseModal = () => setIsModalOpen(false);
 
-  useEffect(() => {
-    setIsModalOpen(true);
-  }, []);
+  // useEffect(() => {
+  //   setIsModalOpen(true);
+  // }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
