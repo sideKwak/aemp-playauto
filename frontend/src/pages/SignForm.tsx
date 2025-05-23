@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 export default function SignForm() {
+  
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -15,16 +17,33 @@ export default function SignForm() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 입력값 변경 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name === 'username') {
+      // 한글 제거 + 영문 소문자, 숫자만 허용
+      const onlyValid = value.replace(/[^a-z0-9]/g, '');
+      setFormData((prev) => ({ ...prev, [name]: onlyValid }));
+      return;
+    }
+
+    if (name === 'phone') {
+      const numeric = value.replace(/\D/g, '').slice(0, 11); // 숫자만, 11자리 제한
+      let formatted = numeric;
+
+      if (numeric.length > 3 && numeric.length <= 7) {
+        formatted = `${numeric.slice(0, 3)}-${numeric.slice(3)}`;
+      } else if (numeric.length > 7) {
+        formatted = `${numeric.slice(0, 3)}-${numeric.slice(3, 7)}-${numeric.slice(7)}`;
+      }
+
+      setFormData((prev) => ({ ...prev, phone: formatted }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 폼 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -34,11 +53,9 @@ export default function SignForm() {
     }
 
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: formData.username,
           password: formData.password,
@@ -51,7 +68,7 @@ export default function SignForm() {
 
       if (response.ok) {
         alert('회원가입 완료!');
-        // window.location.href = '/login';
+        window.location.href = '/login';
       } else {
         const errorData = await response.json();
         alert(`회원가입 실패: ${errorData.message || '서버 에러'}`);
@@ -63,7 +80,7 @@ export default function SignForm() {
   };
 
   useEffect(() => {
-    setIsModalOpen(true); // 진입 시 모달 자동 오픈
+    setIsModalOpen(true);
   }, []);
 
   const handleCloseModal = () => setIsModalOpen(false);
@@ -74,6 +91,11 @@ export default function SignForm() {
 
       <main className="flex flex-col items-center justify-center px-4 py-16 bg-gray-50 min-h-screen">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-8">
+          {/* 뒤로가기 */}
+          <div className="text-sm mb-2">
+            <Link to="/login" className="text-gray-500 hover:text-gray-1000">← 돌아가기</Link>
+          </div>
+
           <h2 className="text-center text-3xl font-extrabold text-gray-900">회원가입</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
 
@@ -81,6 +103,7 @@ export default function SignForm() {
             <div>
               <label htmlFor="username" className="text-sm font-semibold text-gray-600">아이디</label>
               <input
+                autoComplete="username"
                 type="text"
                 id="username"
                 name="username"
@@ -95,6 +118,7 @@ export default function SignForm() {
             <div>
               <label htmlFor="password" className="text-sm font-semibold text-gray-600">비밀번호</label>
               <input
+                autoComplete="new-password"
                 type="password"
                 id="password"
                 name="password"
@@ -109,6 +133,7 @@ export default function SignForm() {
             <div>
               <label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-600">비밀번호 확인</label>
               <input
+                autoComplete="new-password"
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
@@ -147,7 +172,7 @@ export default function SignForm() {
               />
             </div>
 
-            {/* 생일 */}
+            {/* 생년월일 */}
             <div>
               <label htmlFor="birth" className="text-sm font-semibold text-gray-600">생년월일</label>
               <input
@@ -164,6 +189,7 @@ export default function SignForm() {
             <div>
               <label htmlFor="email" className="text-sm font-semibold text-gray-600">이메일</label>
               <input
+                autoComplete="email"
                 type="email"
                 id="email"
                 name="email"
@@ -183,14 +209,13 @@ export default function SignForm() {
                 회원가입
               </button>
             </div>
-
           </form>
         </div>
       </main>
 
       <Footer />
 
-      {/* 모달 추가 */}
+      {/* 안내 모달 */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
           <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-10 relative">
@@ -200,7 +225,6 @@ export default function SignForm() {
             >
               ×
             </button>
-
             <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
               🚀 회원가입 진행 방향
             </h2>

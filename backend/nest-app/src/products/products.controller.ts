@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, Put, Delete, Query, DefaultValuePipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Put, Delete, UseGuards, Query, DefaultValuePipe } from '@nestjs/common';
 import { ProductService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('상품') // ← Swagger 문서에서 그룹 이름으로 나옴
 @Controller('products')
@@ -10,11 +11,13 @@ export class ProductsController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -23,6 +26,7 @@ export class ProductsController {
   }
 
   @Get('search')
+  @UseGuards(JwtAuthGuard)
   searchProducts(
     @Query('name') name: string, @Query('category') category:string
   ){
@@ -31,6 +35,7 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   getProduct(
     @Param('id', ParseIntPipe) id: number
   ){
@@ -38,6 +43,7 @@ export class ProductsController {
   }
   
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   updateProduct(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto
@@ -46,6 +52,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   deleteProduct(
     @Param('id', ParseIntPipe) id: number
   ){
@@ -53,7 +60,8 @@ export class ProductsController {
   }
 
   @Post('bulk')
-  @ApiBody({ type: CreateProductDto, isArray: true }) // ✅ 추가
+  @UseGuards(JwtAuthGuard)
+  @ApiBody({ type: CreateProductDto, isArray: true })
   createProducts(@Body() createProductDtos: CreateProductDto[]) {
     return this.productService.createBulk(createProductDtos);
   }
